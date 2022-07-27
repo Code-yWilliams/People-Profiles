@@ -1,6 +1,12 @@
 import React, { useState } from 'react';
+import { IState as Props } from '../App';
 
-const AddToList = () => {
+interface IProps {
+  people: Props["people"]
+  setPeople: React.Dispatch<React.SetStateAction<Props["people"]>>
+}
+
+const AddToList: React.FC<IProps> = ({ people, setPeople }) => {
 
   const [input, setInput] = useState({
     name: "",
@@ -9,15 +15,41 @@ const AddToList = () => {
     notes: ""
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>) => {
+  const resetInput = (): void => {
+    setInput({
+      name: "",
+      age: "",
+      imgUrl: "",
+      notes: ""
+    })
+  }
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>): void => {
     setInput({
       ...input,
       [e.target.name]: e.target.value
     })
   }
 
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!input.name || !input.age) return;
+    setPeople([
+      ...people,
+      {
+        name: input.name,
+        age: parseInt(input.age),
+        imgUrl: input.imgUrl,
+        notes: input.notes
+      }
+    ]);
+
+    resetInput();
+  }
+
   return (
-    <form className="AddToList">
+    <form className="AddToList" onSubmit={handleSubmit}>
       <input 
         type="text"
         placeholder="Name"
@@ -50,7 +82,7 @@ const AddToList = () => {
         onChange={handleChange}
       />
 
-      <button type="submit" className="AddToList-btn" >
+      <button type="submit" className="AddToList-btn">
         Submit
       </button>
     </form>
